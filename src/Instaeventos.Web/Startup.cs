@@ -1,5 +1,7 @@
-﻿using Owin;
+﻿using Microsoft.Owin;
+using Owin;
 
+[assembly: OwinStartupAttribute(typeof(Instaeventos.Web.Startup))]
 namespace Instaeventos.Web
 {
     public partial class Startup 
