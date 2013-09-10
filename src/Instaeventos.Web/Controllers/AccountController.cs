@@ -10,6 +10,7 @@ using Microsoft.AspNet.Identity.EntityFramework;
 using Microsoft.AspNet.Identity.Owin;
 using Microsoft.Owin.Security;
 using Instaeventos.Web.Models;
+using Instaeventos.Core;
 
 namespace Instaeventos.Web.Controllers
 {
@@ -18,7 +19,7 @@ namespace Instaeventos.Web.Controllers
     {
         public AccountController()
         {
-            IdentityManager = new AuthenticationIdentityManager(new IdentityStore());
+            IdentityManager = new AuthenticationIdentityManager(new IdentityStore(new InstaeventosContext()));
         }
 
         public AccountController(AuthenticationIdentityManager manager)
@@ -88,7 +89,7 @@ namespace Instaeventos.Web.Controllers
             if (ModelState.IsValid)
             {
                 // Create a local login before signing in the user
-                var user = new User(model.UserName);
+                var user = new ApplicationUser(model.UserName) { CreatedDate = DateTime.Now };
                 var result = await IdentityManager.Users.CreateLocalUserAsync(user, model.Password);
                 if (result.Success)
                 {

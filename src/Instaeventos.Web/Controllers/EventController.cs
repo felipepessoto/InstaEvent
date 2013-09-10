@@ -13,12 +13,11 @@ namespace Instaeventos.Web.Controllers
         {
             using (InstaeventosContext context = new InstaeventosContext())
             {
-                if (context.Users.Any() == false && context.Events.Any() == false)
+                if (context.Events.Any() == false)
                 {
-                    var user = context.Users.Add(new User() { Enabled=true, CreatedDate=DateTime.Now, Username="fujiy", Email="felipepessoto@gmail.com", Password="123456" });
                     var newEevent = context.Events.Add(new Event()
                     {
-                        User = user,
+                        User = context.Users.First(),
                         BackgroundUrl = "/Content/Images/1.jpg",
                         CreatedDate = DateTime.Now,
                         Enabled = true,

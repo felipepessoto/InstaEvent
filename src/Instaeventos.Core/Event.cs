@@ -9,7 +9,7 @@ namespace Instaeventos.Core
     public class Event
     {
         public  int Id { get; set; }
-        public User User { get; set; }
+        public ApplicationUser User { get; set; }
         public  string Name { get; set; }
         public string HashTag { get; set; }
         public DateTime StartDate { get; set; }
