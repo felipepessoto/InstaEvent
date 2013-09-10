@@ -1,9 +1,8 @@
-﻿@model InstaSharp.Model.Responses.MediasResponse
-<!-- Main component for a primary marketing message or call to action -->
+﻿@model IEnumerable<Instaeventos.Core.InstagramPhoto>
 <div class="jumbotron">
-    @foreach (var item in Model.Data)
+    @foreach (var item in Model)
     {
-        <p><img src=@item.Images.LowResolution.Url /></p>
+        <p><img src=@item.ImageUrl />@item.PublishDate <input type="checkbox" name="selectedItems" value="@item.Id" /></p>
     }
 </div>
 

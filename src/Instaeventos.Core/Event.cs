@@ -19,6 +19,7 @@ namespace Instaeventos.Core
         public string SliderEffect { get; set; }
         public bool AutomaticApproval { set; get; }
         public bool IsPublic { get; set; }
+        public string NextMaxTagId { get; set; }
         public DateTime CreatedDate { get; set; }
     }
 }

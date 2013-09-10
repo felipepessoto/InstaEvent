@@ -13,6 +13,7 @@ namespace Instaeventos.Core
         public string FullResponse { get; set; }
         public string InstagramUsername { get; set; }
         public string ImageUrl { get; set; }
+        public string PostUrl { get; set; }
         public DateTime PublishDate { get; set; }
         public string IdInstagram { get; set; }
         public string Description { get; set; }

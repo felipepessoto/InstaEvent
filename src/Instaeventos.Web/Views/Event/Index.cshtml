@@ -1,0 +1,33 @@
+﻿@model IEnumerable<Instaeventos.Core.InstagramPhoto>
+
+<img id="showPhoto" />
+
+@section scripts{
+    
+<script>
+
+    var photos = [];
+    var currentIndex = 0;
+
+    $.get("/api/InstagramPhoto/").done(function (resultado) {
+        photos = resultado;
+        trocarPhoto();
+        setInterval(trocarPhoto, 5000);
+    });
+
+    function trocarPhoto() {
+        if (photos.length > 0) {
+            currentIndex++;
+            if (currentIndex > photos.length - 1) {
+                currentIndex = 0;
+            }
+
+            $('#showPhoto').fadeOut(1000, function () {
+                $('#showPhoto').prop('src', photos[currentIndex].ImageUrl);
+            }).fadeIn(1000);            
+        }
+    }
+</script>
+        
+}
+
