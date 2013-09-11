@@ -13,6 +13,7 @@
         photos = resultado;
         trocarPhoto();
         setInterval(trocarPhoto, 5000);
+        setInterval(checkNewPhotos, 5000);
     });
 
     function trocarPhoto() {
@@ -26,6 +27,16 @@
                 $('#showPhoto').prop('src', photos[currentIndex].ImageUrl);
             }).fadeIn(1000);            
         }
+    }
+
+    function checkNewPhotos() {
+        $.get("/api/InstagramPhoto/?newPhotos=true").done(function (resultado) {
+            if (resultado.length > 0) {
+                var newIndex = photos.length - 1;
+                photos = photos.concat(resultado);
+                currentIndex = newIndex;
+            }
+        });
     }
 </script>
         

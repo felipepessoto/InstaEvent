@@ -15,13 +15,21 @@ namespace Instaeventos.Web.Controllers
         {
             using (InstaeventosContext context = new InstaeventosContext())
             {
-                IQueryable<InstagramPhoto> query = context.InstagramPhotos;
+                IQueryable<InstagramPhoto> query = context.InstagramPhotos.Where(x => x.Approved);
                 if (newPhotos)
                 {
-                    //query = query.Where(x=>x.)
+                    query = query.Where(x => x.NeverShown);
                 }
 
-                return query.ToList();
+                var photos = query.ToList();
+
+                foreach (var item in photos)
+                {
+                    item.NeverShown = false;
+                }
+                context.SaveChanges();
+
+                return photos;
             }
         }
     }

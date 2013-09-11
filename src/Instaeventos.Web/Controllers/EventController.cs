@@ -13,6 +13,26 @@ namespace Instaeventos.Web.Controllers
         {
             using (InstaeventosContext context = new InstaeventosContext())
             {
+                var currentEvent = context.Events.Find(id);
+
+                if (currentEvent == null)
+                {
+                    currentEvent = context.Events.Add(new Event()
+                    {
+                        User = context.Users.First(),
+                        BackgroundUrl = "/Content/Images/1.jpg",
+                        CreatedDate = DateTime.Now,
+                        Enabled = true,
+                        HashTag = "fujiy",
+                        IsPublic = true,
+                        Name = "Casamento do Michael",
+                        StartDate = new DateTime(2013, 1, 1),
+                        EndDate = new DateTime(2014, 1, 1),
+                        SliderEffect = "normal"
+                    });
+                }
+                context.SaveChanges();
+
                 return View(context.InstagramPhotos.Where(x => x.Approved).ToList());
             }
         }
@@ -32,46 +52,32 @@ namespace Instaeventos.Web.Controllers
 
             using (InstaeventosContext context = new InstaeventosContext())
             {
-                var currentEvent = context.Events.Find(id);
-
-                if (currentEvent == null)
+                if (context.InstagramPhotos.Count(x => x.Approved == false) < 10)
                 {
-                    currentEvent = context.Events.Add(new Event()
+                    var currentEvent = context.Events.Find(id);
+
+                    var postsTag = new InstaSharp.Endpoints.Tags.Unauthenticated(config).Recent("csharp", null, currentEvent.NextMaxTagId);
+
+                    foreach (var item in postsTag.Data)
                     {
-                        User = context.Users.First(),
-                        BackgroundUrl = "/Content/Images/1.jpg",
-                        CreatedDate = DateTime.Now,
-                        Enabled = true,
-                        HashTag = "fujiy",
-                        IsPublic = true,
-                        Name = "Casamento do Michael",
-                        StartDate = new DateTime(2013, 1, 1),
-                        EndDate = new DateTime(2014, 1, 1),
-                        SliderEffect = "normal"
-                    });
+                        context.InstagramPhotos.Add(new InstagramPhoto()
+                        {
+                            Event = currentEvent,
+                            FullResponse = item.ToString(),
+                            InstagramUsername = item.User.Username,
+                            ImageUrl = item.Images.StandardResolution.Url,
+                            PublishDate = item.CreatedTime,
+                            IdInstagram = item.Id,
+                            Description = item.Caption,
+                            PostUrl = item.Link,
+                            Approved = currentEvent.AutomaticApproval,
+                            NeverShown = true,
+                            CreatedDate = DateTime.Now
+                        });
+                    }
+
+                    currentEvent.NextMaxTagId = postsTag.Pagination.NextMaxId;
                 }
-
-                var postsTag = new InstaSharp.Endpoints.Tags.Unauthenticated(config).Recent("csharp", null, currentEvent.NextMaxTagId);
-
-                foreach (var item in postsTag.Data)
-                {
-                    break;
-                    context.InstagramPhotos.Add(new InstagramPhoto()
-                    {
-                        Event = currentEvent,
-                        FullResponse = item.ToString(),
-                        InstagramUsername = item.User.Username,
-                        ImageUrl = item.Images.StandardResolution.Url,
-                        PublishDate = item.CreatedTime,
-                        IdInstagram = item.Id,
-                        Description = item.Caption,
-                        PostUrl = item.Link,
-                        Approved = currentEvent.AutomaticApproval,
-                        CreatedDate = DateTime.Now
-                    });
-                }
-
-                currentEvent.NextMaxTagId = postsTag.Pagination.NextMaxId;
 
                 context.SaveChanges();
 
@@ -79,6 +85,7 @@ namespace Instaeventos.Web.Controllers
             }
         }
 
+        [HttpPost]
         public ActionResult Approve(int id, int[] selectedItems)
         {
             using (InstaeventosContext context = new InstaeventosContext())

@@ -18,6 +18,7 @@ namespace Instaeventos.Core
         public string IdInstagram { get; set; }
         public string Description { get; set; }
         public bool Approved { get; set; }
+        public bool NeverShown { get; set; }
         public DateTime CreatedDate { get; set; }
     }
 }

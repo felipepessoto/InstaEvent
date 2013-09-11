@@ -1,8 +1,11 @@
 ﻿@model IEnumerable<Instaeventos.Core.InstagramPhoto>
 <div class="jumbotron">
-    @foreach (var item in Model)
+    @using (Html.BeginForm())
     {
-        <p><img src=@item.ImageUrl />@item.PublishDate <input type="checkbox" name="selectedItems" value="@item.Id" /></p>
+        <input type="submit" />
+        foreach (var item in Model)
+        {
+            <p><img src=@item.ImageUrl />@item.PublishDate <input type="checkbox" name="selectedItems" value="@item.Id" /></p>
+        }
     }
 </div>
-
