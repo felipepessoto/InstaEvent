@@ -1,4 +1,5 @@
 ﻿using Instaeventos.Core;
+using Instaeventos.Web.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -15,48 +16,64 @@ namespace Instaeventos.Web.Controllers
             {
                 var currentEvent = context.Events.Find(id);
 
-                if (currentEvent == null)
-                {
-                    currentEvent = context.Events.Add(new Event()
-                    {
-                        User = context.Users.First(),
-                        BackgroundUrl = "/Content/Images/1.jpg",
-                        CreatedDate = DateTime.Now,
-                        Enabled = true,
-                        HashTag = "fujiy",
-                        IsPublic = true,
-                        Name = "Casamento do Michael",
-                        StartDate = new DateTime(2013, 1, 1),
-                        EndDate = new DateTime(2014, 1, 1),
-                        SliderEffect = "normal"
-                    });
-                }
                 context.SaveChanges();
 
-                return View(context.InstagramPhotos.Where(x => x.Approved).ToList());
+                return View(id);
             }
         }
 
-        public ActionResult Configure()
+        public ActionResult Configure(int? id)
         {
-            ViewBag.Message = "Your application description page.";
+            using (InstaeventosContext context = new InstaeventosContext())
+            {
+                var viewModel = id.HasValue ?
+                    context.Events.Where(x => x.Id == id.Value).Select(x => new EventConfigureSave { Name = x.Name, HashTag = x.HashTag, AutomaticApproval = x.AutomaticApproval }).Single() :
+                    new EventConfigureSave();
 
+                return View(viewModel);
+            }
+        }
+
+        [HttpPost]
+        public ActionResult Configure(int? id, EventConfigureSave data)
+        {
+            if (ModelState.IsValid)
+            {
+                using (InstaeventosContext context = new InstaeventosContext())
+                {
+                    var editedEvent = id.HasValue ? context.Events.Find(id.Value) : context.Events.Add(new Event()
+                    {
+                        User = context.Users.Single(x=>x.UserName == User.Identity.Name),
+                        BackgroundUrl = "/Content/Images/1.jpg",
+                        CreatedDate = DateTime.Now,
+                        Enabled = true,
+                        IsPublic = true,
+                        StartDate = new DateTime(2013, 1, 1),
+                        EndDate = new DateTime(2014, 1, 1),
+                        SliderEffect = "normal",
+                    });
+                    editedEvent.Name = data.Name;
+                    editedEvent.HashTag = data.HashTag;
+                    editedEvent.AutomaticApproval = data.AutomaticApproval;
+
+                    context.SaveChanges();
+                    return RedirectToAction("Approve", new { id = editedEvent.Id });
+                }
+            }
             return View();
         }
 
         public ActionResult Approve(int id)
         {
-            var config = new InstaSharp.InstagramConfig("https://api.instagram.com/v1",
-                "https://api.instagram.com/oauth", "554dfe9286994bbe98417d8dc7b69a24",
-                "39de8776637b47d2829cd1a4708ae180", "http://blog.fujiy.net");
+            var config = new InstaSharp.InstagramConfig("554dfe9286994bbe98417d8dc7b69a24", "39de8776637b47d2829cd1a4708ae180", "http://blog.fujiy.net", "http://blog.fujiy.net");
 
             using (InstaeventosContext context = new InstaeventosContext())
             {
-                if (context.InstagramPhotos.Count(x => x.Approved == false) < 10)
+                if (context.InstagramPhotos.Count(x => x.Event.Id == id && x.Approved == false) < 10)
                 {
                     var currentEvent = context.Events.Find(id);
 
-                    var postsTag = new InstaSharp.Endpoints.Tags.Unauthenticated(config).Recent("csharp", null, currentEvent.NextMaxTagId);
+                    var postsTag = new InstaSharp.Endpoints.Tags(config).Recent(currentEvent.HashTag, currentEvent.NextMinTagId).Data;
 
                     foreach (var item in postsTag.Data)
                     {
@@ -68,20 +85,19 @@ namespace Instaeventos.Web.Controllers
                             ImageUrl = item.Images.StandardResolution.Url,
                             PublishDate = item.CreatedTime,
                             IdInstagram = item.Id,
-                            Description = item.Caption,
+                            Description = item.Caption.Text,
                             PostUrl = item.Link,
                             Approved = currentEvent.AutomaticApproval,
                             NeverShown = true,
                             CreatedDate = DateTime.Now
                         });
                     }
-
-                    currentEvent.NextMaxTagId = postsTag.Pagination.NextMaxId;
+                    currentEvent.NextMinTagId = postsTag.Pagination.NextMinId;
                 }
 
                 context.SaveChanges();
 
-                return View(context.InstagramPhotos.Where(x => x.Approved == false).ToList());
+                return View(context.InstagramPhotos.Where(x => x.Event.Id == id && x.Approved == false).ToList());
             }
         }
 

@@ -1,4 +1,4 @@
-﻿@model IEnumerable<Instaeventos.Core.InstagramPhoto>
+﻿@model int
 
 <img id="showPhoto" />
 
@@ -9,7 +9,7 @@
     var photos = [];
     var currentIndex = 0;
 
-    $.get("/api/InstagramPhoto/").done(function (resultado) {
+    $.get("/api/InstagramPhoto/?idEvent=@(Model)").done(function (resultado) {
         photos = resultado;
         trocarPhoto();
         setInterval(trocarPhoto, 5000);

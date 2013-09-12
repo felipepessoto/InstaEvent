@@ -11,11 +11,11 @@ namespace Instaeventos.Web.Controllers
     public class InstagramPhotoController : ApiController
     {
         // GET api/<controller>
-        public IEnumerable<InstagramPhoto> Get(bool newPhotos=false)
+        public IEnumerable<InstagramPhoto> Get(int idEvent, bool newPhotos=false)
         {
             using (InstaeventosContext context = new InstaeventosContext())
             {
-                IQueryable<InstagramPhoto> query = context.InstagramPhotos.Where(x => x.Approved);
+                IQueryable<InstagramPhoto> query = context.InstagramPhotos.Where(x =>x.Event.Id == idEvent && x.Approved);
                 if (newPhotos)
                 {
                     query = query.Where(x => x.NeverShown);
