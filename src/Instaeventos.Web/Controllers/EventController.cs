@@ -69,31 +69,7 @@ namespace Instaeventos.Web.Controllers
 
             using (InstaeventosContext context = new InstaeventosContext())
             {
-                if (context.InstagramPhotos.Count(x => x.Event.Id == id && x.Approved == false) < 10)
-                {
-                    var currentEvent = context.Events.Find(id);
-
-                    var postsTag = new InstaSharp.Endpoints.Tags(config).Recent(currentEvent.HashTag, currentEvent.NextMinTagId).Data;
-
-                    foreach (var item in postsTag.Data)
-                    {
-                        context.InstagramPhotos.Add(new InstagramPhoto()
-                        {
-                            Event = currentEvent,
-                            FullResponse = item.ToString(),
-                            InstagramUsername = item.User.Username,
-                            ImageUrl = item.Images.StandardResolution.Url,
-                            PublishDate = item.CreatedTime,
-                            IdInstagram = item.Id,
-                            Description = item.Caption.Text,
-                            PostUrl = item.Link,
-                            Approved = currentEvent.AutomaticApproval,
-                            NeverShown = true,
-                            CreatedDate = DateTime.Now
-                        });
-                    }
-                    currentEvent.NextMinTagId = postsTag.Pagination.NextMinId;
-                }
+                new InstagramPhotoFetcher(context, config).ImportNewPhotos(id);
 
                 context.SaveChanges();
 
