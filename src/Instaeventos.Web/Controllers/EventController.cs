@@ -1,9 +1,8 @@
 ﻿using Instaeventos.Core;
 using Instaeventos.Web.ViewModels;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Web;
+using System.Threading.Tasks;
 using System.Web.Mvc;
 
 namespace Instaeventos.Web.Controllers
@@ -63,13 +62,13 @@ namespace Instaeventos.Web.Controllers
             return View();
         }
 
-        public ActionResult Approve(int id)
+        public async Task<ActionResult> Approve(int id)
         {
-            var config = new InstaSharp.InstagramConfig("554dfe9286994bbe98417d8dc7b69a24", "39de8776637b47d2829cd1a4708ae180", "http://blog.fujiy.net", "http://blog.fujiy.net");
+            var config = new InstaSharp.InstagramConfig("554dfe9286994bbe98417d8dc7b69a24", "39de8776637b47d2829cd1a4708ae180");
 
             using (InstaeventosContext context = new InstaeventosContext())
             {
-                new InstagramPhotoFetcher(context, config).ImportNewPhotos(id);
+                await new InstagramPhotoFetcher(context, config).ImportNewPhotos(id);
 
                 context.SaveChanges();
 

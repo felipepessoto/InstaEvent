@@ -1,4 +1,9 @@
 ﻿@model int
+           
+@{
+    Layout = null;
+}
+
 
 <img id="showPhoto" />
 
@@ -30,7 +35,7 @@
     }
 
     function checkNewPhotos() {
-        $.get("/api/InstagramPhoto/?newPhotos=true").done(function (resultado) {
+        $.get("/api/InstagramPhoto/?idEvent=@(Model)&newPhotos=true").done(function (resultado) {
             if (resultado.length > 0) {
                 var newIndex = photos.length - 1;
                 photos = photos.concat(resultado);

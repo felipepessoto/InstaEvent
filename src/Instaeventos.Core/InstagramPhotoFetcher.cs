@@ -18,11 +18,11 @@ namespace Instaeventos.Core
             this.context = context;
         }
 
-        public void ImportNewPhotos(int idEvent)
+        public async Task ImportNewPhotos(int idEvent)
         {
             var currentEvent = context.Events.Find(idEvent);
 
-            var postsTag = new InstaSharp.Endpoints.Tags(instagramConfig).Recent(currentEvent.HashTag, currentEvent.NextMinTagId).Data;
+            var postsTag = await new InstaSharp.Endpoints.Tags(instagramConfig).Recent(currentEvent.HashTag, currentEvent.NextMinTagId);
 
             foreach (var item in postsTag.Data)
             {
