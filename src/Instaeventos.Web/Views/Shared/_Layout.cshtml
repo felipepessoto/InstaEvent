@@ -1,4 +1,5 @@
-﻿<!DOCTYPE html>
+﻿@using Instaeventos.Core
+<!DOCTYPE html>
 <html>
 <head>
     <meta charset="utf-8" />
@@ -7,17 +8,8 @@
     @Styles.Render("~/Content/css")
     @Scripts.Render("~/bundles/modernizr")
 
-
     <!-- Custom styles for this template -->
     <link href="/content/navbar-fixed-top.css" rel="stylesheet">
-
-    <!-- HTML5 shim and Respond.js IE8 support of HTML5 elements and media queries -->
-    <!--[if lt IE 9]>
-      <script src="../../assets/js/html5shiv.js"></script>
-      <script src="../../assets/js/respond.min.js"></script>
-    <![endif]-->
-
-
 </head>
 <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -28,26 +20,32 @@
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-                <a class="navbar-brand" href="#">Evento XYZ</a>
+                <a class="navbar-brand" href="#">Instaeventos</a>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li class="active"><a href="#">Configuração</a></li>
-                    <li>@Html.ActionLink("Aprovar Fotos", "Approve", "Event")</li>
-                    <li><a href="#about">Album</a></li>
-                    <li><a href="#contact">Visualizar</a></li>
-                    <!-- <li class="dropdown">
-                       <a href="#" class="dropdown-toggle" data-toggle="dropdown">Evento XYZ<b class="caret"></b></a>
-                       <ul class="dropdown-menu">
-                         <li><a href="#">Action</a></li>
-                         <li><a href="#">Another action</a></li>
-                         <li><a href="#">Something else here</a></li>
-                         <li class="divider"></li>
-                         <li class="dropdown-header">Nav header</li>
-                         <li><a href="#">Separated link</a></li>
-                         <li><a href="#">One more separated link</a></li>
-                       </ul>
-                     </li>-->
+                    @if (User.Identity.IsAuthenticated)
+                    {
+                        <li class="active">@Html.ActionLink("Novo Evento", MVC.Event.Configure(null))</li>
+                    }
+                    @using (InstaeventosContext context = new InstaeventosContext())
+                    {
+                        foreach (var evento in context.Events.Where(x => x.User.UserName == User.Identity.Name))
+                        {
+                            <li class="dropdown">
+                                <a href="#" class="dropdown-toggle" data-toggle="dropdown">@evento.Name<b class="caret"></b></a>
+                                <ul class="dropdown-menu">
+                                    <li>@Html.ActionLink("Visualizar", MVC.Event.Index(evento.Id))</li>
+                                    <li>@Html.ActionLink("Aprovar Fotos", MVC.Event.Approve(evento.Id))</li>
+                                    <li>@Html.ActionLink("Configuração", MVC.Event.Configure(evento.Id))</li>
+                                    @*<li class="divider"></li>
+                                    <li class="dropdown-header">Nav header</li>
+                                    <li><a href="#">Separated link</a></li>
+                                    <li><a href="#">One more separated link</a></li>*@
+                                </ul>
+                            </li>
+                        }
+                    }
                 </ul>
                 @Html.Partial("_LoginPartial")
             </div>

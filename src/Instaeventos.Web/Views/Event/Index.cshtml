@@ -1,49 +1,74 @@
 ﻿@model int
-           
+
 @{
     Layout = null;
 }
 
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Instaeventos</title>
+</head>
+<body style="text-align: center;">
+    <img id="showPhoto" />
 
-<img id="showPhoto" />
+    @Scripts.Render("~/bundles/jquery")
+    <script>
 
-@section scripts{
-    
-<script>
+        var photos = [];
+        var currentIndex = 0;
 
-    var photos = [];
-    var currentIndex = 0;
-
-    $.get("/api/InstagramPhoto/?idEvent=@(Model)").done(function (resultado) {
-        photos = resultado;
-        trocarPhoto();
-        setInterval(trocarPhoto, 5000);
-        setInterval(checkNewPhotos, 5000);
-    });
-
-    function trocarPhoto() {
-        if (photos.length > 0) {
-            currentIndex++;
-            if (currentIndex > photos.length - 1) {
-                currentIndex = 0;
-            }
-
-            $('#showPhoto').fadeOut(1000, function () {
-                $('#showPhoto').prop('src', photos[currentIndex].ImageUrl);
-            }).fadeIn(1000);            
-        }
-    }
-
-    function checkNewPhotos() {
-        $.get("/api/InstagramPhoto/?idEvent=@(Model)&newPhotos=true").done(function (resultado) {
-            if (resultado.length > 0) {
-                var newIndex = photos.length - 1;
-                photos = photos.concat(resultado);
-                currentIndex = newIndex;
-            }
+        $.get("/api/InstagramPhoto/?idEvent=@(Model)").done(function (resultado) {
+            photos = resultado;
+            setTimeout(trocarPhoto, 5000);
+            checkNewPhotos();
         });
-    }
-</script>
-        
-}
 
+        function trocarPhoto() {
+            try {
+                if (photos.length > 0) {
+                    currentIndex++;
+                    if (currentIndex > photos.length - 1) {
+                        currentIndex = 0;
+                    }
+
+                    var url = photos[currentIndex].ImageUrl;
+
+                    var horaInicio;
+                    var img = new Image();
+                    img.onload = function () {
+                        var horaFim = window.performance ? window.performance.now() : new Date();
+                        console.log('Imagem carregada: ' + (horaFim - horaInicio) + "milliseconds");
+                        $('#showPhoto').fadeOut(1000, function () {
+                            $('#showPhoto').prop('src', url);
+                        }).fadeIn(1000);
+                        setTimeout(trocarPhoto, 5000);
+                    };
+                    horaInicio = window.performance ? window.performance.now() : new Date();
+                    img.src = url;
+                } else {
+                    setTimeout(trocarPhoto, 5000);
+                }
+            } catch (e) {
+                setTimeout(trocarPhoto, 5000);
+            }
+        }
+
+        function checkNewPhotos() {
+            $.get("/api/InstagramPhoto/?idEvent=@(Model)&newPhotos=true")
+                .done(function(resultado) {
+                    if (resultado.length > 0) {
+                        var newIndex = photos.length - 1;
+                        photos = photos.concat(resultado);
+                        currentIndex = newIndex;
+                    }
+                })
+                .always(function() {
+                    setTimeout(checkNewPhotos, 5000);
+                });
+        }
+    </script>
+</body>
+</html>

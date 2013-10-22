@@ -7,9 +7,9 @@ using System.Web.Mvc;
 
 namespace Instaeventos.Web.Controllers
 {
-    public class EventController : Controller
+    public partial class EventController : Controller
     {
-        public ActionResult Index(int id)
+        public virtual ActionResult Index(int id)
         {
             using (InstaeventosContext context = new InstaeventosContext())
             {
@@ -21,7 +21,7 @@ namespace Instaeventos.Web.Controllers
             }
         }
 
-        public ActionResult Configure(int? id)
+        public virtual ActionResult Configure(int? id)
         {
             using (InstaeventosContext context = new InstaeventosContext())
             {
@@ -34,7 +34,7 @@ namespace Instaeventos.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult Configure(int? id, EventConfigureSave data)
+        public virtual ActionResult Configure(int? id, EventConfigureSave data)
         {
             if (ModelState.IsValid)
             {
@@ -62,7 +62,7 @@ namespace Instaeventos.Web.Controllers
             return View();
         }
 
-        public async Task<ActionResult> Approve(int id)
+        public virtual async Task<ActionResult> Approve(int id)
         {
             var config = new InstaSharp.InstagramConfig("554dfe9286994bbe98417d8dc7b69a24", "39de8776637b47d2829cd1a4708ae180");
 
@@ -77,7 +77,7 @@ namespace Instaeventos.Web.Controllers
         }
 
         [HttpPost]
-        public ActionResult Approve(int id, int[] selectedItems)
+        public virtual ActionResult Approve(int id, int[] selectedItems)
         {
             using (InstaeventosContext context = new InstaeventosContext())
             {
