@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using InstaSharp;
+using InstaSharp.Models;
 
 namespace Instaeventos.Core
 {
@@ -24,7 +25,21 @@ namespace Instaeventos.Core
 
             var postsTag = await new InstaSharp.Endpoints.Tags(instagramConfig).Recent(currentEvent.HashTag, currentEvent.NextMinTagId);
 
-            foreach (var item in postsTag.Data)
+            List<Media> fotos = postsTag.Data;
+            string nextMaxId = postsTag.Pagination.NextMaxId;
+            string nextMinId = postsTag.Pagination.NextMinId;
+
+            while (nextMaxId != null)
+            {
+                var postsTagPaginado = await new InstaSharp.Endpoints.Tags(instagramConfig).Recent(currentEvent.HashTag, null, nextMaxId);
+                fotos.AddRange(postsTagPaginado.Data);
+                nextMaxId = postsTagPaginado.Pagination.NextMaxId;
+            }
+
+            var idsRetorno = fotos.Select(x => x.Id).ToArray();
+            var idsInstagramExistentes = context.InstagramPhotos.Where(x => idsRetorno.Contains(x.IdInstagram)).Select(x => x.IdInstagram).ToArray();
+
+            foreach (var item in fotos.Where(x => idsInstagramExistentes.Contains(x.Id) == false))
             {
                 context.InstagramPhotos.Add(new InstagramPhoto
                 {
@@ -34,14 +49,28 @@ namespace Instaeventos.Core
                     ImageUrl = item.Images.StandardResolution.Url,
                     PublishDate = item.CreatedTime,
                     IdInstagram = item.Id,
-                    Description = item.Caption!=null?item.Caption.Text:"",
+                    Description = item.Caption != null ? item.Caption.Text : "",
                     PostUrl = item.Link,
                     Approved = currentEvent.AutomaticApproval,
                     NeverShown = true,
                     CreatedDate = DateTime.Now
                 });
             }
-            currentEvent.NextMinTagId = postsTag.Pagination.NextMinId;
+
+            if (nextMinId != null)
+            {
+                try
+                {
+                    if (long.Parse(nextMinId) > long.Parse(currentEvent.NextMinTagId ?? "0"))
+                    {
+                        currentEvent.NextMinTagId = nextMinId;
+                    }
+                }
+                catch
+                {
+                    currentEvent.NextMinTagId = nextMinId;
+                }
+            }
         }
     }
 }

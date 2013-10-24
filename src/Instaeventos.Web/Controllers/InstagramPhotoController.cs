@@ -18,6 +18,7 @@ namespace Instaeventos.Web.Controllers
                 if (context.Events.Any(x => x.Id == idEvent && x.AutomaticApproval))
                 {
                     await new InstagramPhotoFetcher(context, config).ImportNewPhotos(idEvent);
+                    context.SaveChanges();
                 }
 
                 IQueryable<InstagramPhoto> query = context.InstagramPhotos.Where(x =>x.Event.Id == idEvent && x.Approved);
