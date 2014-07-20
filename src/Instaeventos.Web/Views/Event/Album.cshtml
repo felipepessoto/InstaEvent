@@ -1,0 +1,9 @@
+﻿@model IEnumerable<Instaeventos.Core.InstagramPhoto>
+<div class="jumbotron">
+
+    @foreach (var item in Model)
+    {
+        <p><img src=@item.ImageUrl />@item.PublishDate</p>
+    }
+
+</div>

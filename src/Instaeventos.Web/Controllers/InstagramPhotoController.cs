@@ -26,6 +26,11 @@ namespace Instaeventos.Web.Controllers
                 {
                     query = query.Where(x => x.NeverShown);
                 }
+                else
+                {
+                    query = query.OrderByDescending(x => x.CreatedDate);
+                }
+
 
                 var photos = query.ToList();
 

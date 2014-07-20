@@ -63,6 +63,12 @@ namespace Instaeventos.Web.Controllers
             var callInfo = new T4MVC_System_Web_Mvc_ActionResult(Area, Name, ActionNames.Approve);
             return System.Threading.Tasks.Task.FromResult(callInfo as ActionResult);
         }
+        [NonAction]
+        [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+        public virtual System.Web.Mvc.ActionResult Album()
+        {
+            return new T4MVC_System_Web_Mvc_ActionResult(Area, Name, ActionNames.Album);
+        }
 
         [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
         public EventController Actions { get { return MVC.Event; } }
@@ -82,6 +88,7 @@ namespace Instaeventos.Web.Controllers
             public readonly string Index = "Index";
             public readonly string Configure = "Configure";
             public readonly string Approve = "Approve";
+            public readonly string Album = "Album";
         }
 
         [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
@@ -90,6 +97,7 @@ namespace Instaeventos.Web.Controllers
             public const string Index = "Index";
             public const string Configure = "Configure";
             public const string Approve = "Approve";
+            public const string Album = "Album";
         }
 
 
@@ -119,6 +127,14 @@ namespace Instaeventos.Web.Controllers
             public readonly string id = "id";
             public readonly string selectedItems = "selectedItems";
         }
+        static readonly ActionParamsClass_Album s_params_Album = new ActionParamsClass_Album();
+        [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+        public ActionParamsClass_Album AlbumParams { get { return s_params_Album; } }
+        [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
+        public class ActionParamsClass_Album
+        {
+            public readonly string id = "id";
+        }
         static readonly ViewsClass s_views = new ViewsClass();
         [GeneratedCode("T4MVC", "2.0"), DebuggerNonUserCode]
         public ViewsClass Views { get { return s_views; } }
@@ -129,10 +145,12 @@ namespace Instaeventos.Web.Controllers
             public _ViewNamesClass ViewNames { get { return s_ViewNames; } }
             public class _ViewNamesClass
             {
+                public readonly string Album = "Album";
                 public readonly string Approve = "Approve";
                 public readonly string Configure = "Configure";
                 public readonly string Index = "Index";
             }
+            public readonly string Album = "~/Views/Event/Album.cshtml";
             public readonly string Approve = "~/Views/Event/Approve.cshtml";
             public readonly string Configure = "~/Views/Event/Configure.cshtml";
             public readonly string Index = "~/Views/Event/Index.cshtml";
@@ -193,6 +211,16 @@ namespace Instaeventos.Web.Controllers
             ModelUnbinderHelpers.AddRouteValues(callInfo.RouteValueDictionary, "id", id);
             ModelUnbinderHelpers.AddRouteValues(callInfo.RouteValueDictionary, "selectedItems", selectedItems);
             ApproveOverride(callInfo, id, selectedItems);
+            return callInfo;
+        }
+
+        partial void AlbumOverride(T4MVC_System_Web_Mvc_ActionResult callInfo, int id);
+
+        public override System.Web.Mvc.ActionResult Album(int id)
+        {
+            var callInfo = new T4MVC_System_Web_Mvc_ActionResult(Area, Name, ActionNames.Album);
+            ModelUnbinderHelpers.AddRouteValues(callInfo.RouteValueDictionary, "id", id);
+            AlbumOverride(callInfo, id);
             return callInfo;
         }
 

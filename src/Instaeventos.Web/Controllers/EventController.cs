@@ -90,5 +90,15 @@ namespace Instaeventos.Web.Controllers
 
             return RedirectToAction("Approve");
         }
+
+        public virtual ActionResult Album(int id)
+        {
+            var config = new InstaSharp.InstagramConfig("554dfe9286994bbe98417d8dc7b69a24", "39de8776637b47d2829cd1a4708ae180");
+
+            using (InstaeventosContext context = new InstaeventosContext())
+            {
+                return View(context.InstagramPhotos.Where(x => x.Event.Id == id && x.Approved == true).ToList());
+            }
+        }
     }
 }
